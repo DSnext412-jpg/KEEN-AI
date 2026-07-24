@@ -1,45 +1,74 @@
-# [Project name]
+# KEEN AI
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A modern AI workspace platform — a dark, focused command center for builders and creators to think and create alongside AI.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/api-server run dev` — run the API server (port 8080)
+- `pnpm --filter @workspace/keen-ai run dev` — run the frontend (port 18498)
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- Required env: `DATABASE_URL` — Postgres connection string (auto-provisioned by Replit)
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
+- Frontend: React + Vite, Tailwind CSS, shadcn/ui, Framer Motion, Wouter
+- Auth: Supabase (client-side, @supabase/supabase-js)
+- AI: Google Gemini (via direct GEMINI_API_KEY)
 - DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
+- Validation: Zod (zod/v4), drizzle-zod
 - API codegen: Orval (from OpenAPI spec)
 - Build: esbuild (CJS bundle)
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/keen-ai/` — React frontend
+- `artifacts/api-server/` — Express API backend
+- `lib/api-spec/openapi.yaml` — OpenAPI spec (source of truth for API contracts)
+- `lib/api-client-react/src/generated/` — Generated React Query hooks
+- `lib/api-zod/src/generated/` — Generated Zod schemas
+- `lib/db/src/schema/` — Drizzle ORM schemas (conversations, messages, userProfiles)
+- `lib/integrations-gemini-ai/` — Gemini AI client wrapper
+
+## Secrets Required
+
+- `GEMINI_API_KEY` — Google Gemini API key (aistudio.google.com)
+- `SUPABASE_URL` + `SUPABASE_ANON_KEY` — Supabase project credentials (server-side)
+- `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` — Same values, VITE_ prefix for frontend
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Supabase handles auth entirely client-side; backend routes are unauthenticated at Phase 1 (auth enforcement planned for later phases)
+- Gemini integration uses direct API key (GEMINI_API_KEY) instead of Replit AI Integration proxy
+- AI chat uses SSE streaming via raw fetch (not React Query hook) since Orval can't type SSE responses
+- All API contracts defined in OpenAPI first, then codegen runs to produce hooks + Zod schemas
 
-## Product
+## Product — Phase 1 Complete
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Landing page with hero, features, CTA
+- Supabase authentication (email/password sign in + sign up)
+- Dashboard with conversation stats
+- AI Chat with Gemini (streaming SSE, conversation history, sidebar)
+- Settings (profile editing, theme switcher light/dark/system)
+- Command palette (Ctrl+K)
+- Responsive design with dark-first aesthetic
+
+## Roadmap
+
+Phases 2–10 planned covering: AI Writing Workspace, Document Intelligence, Smart Notes, AI Code Studio, Productivity, Voice AI, Research, Automation, Memory & Plugins.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Build in phases — instructions given one at a time
+- Supabase for authentication
+- Gemini for AI features
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
-
-## Pointers
-
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- After any OpenAPI spec change, run `pnpm --filter @workspace/api-spec run codegen` before editing routes
+- `@google/genai` must be listed in `artifacts/api-server/package.json` dependencies (not just the lib) for esbuild to bundle it
+- Gemini image client uses GEMINI_API_KEY (not the AI_INTEGRATIONS_ env vars from the Replit proxy)
+- VITE_ prefix required for any env vars accessed in the frontend
