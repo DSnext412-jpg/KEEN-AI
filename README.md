@@ -184,8 +184,6 @@ Contributions are welcome! Feel free to open an issue or submit a pull request.
 
 <div align="center">
 
-**Built for the bold.**
-
 [⬆ Back to top](#keen-ai)
 
 </div>
