@@ -136,8 +136,6 @@ npm run dev
 
 ### ⭐ Star this repository if you like the project!
 
-<img src="https://github-readme-stats.vercel.app/api?username=DSnext412-jpg&show_icons=true&theme=tokyonight&hide_border=true"/>
-
 ---
 *Build Smart. Think Bigger.*
 
